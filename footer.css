@@ -1,0 +1,18 @@
+body{
+    margin: 0;
+}
+
+
+footer {
+    margin-top: 30%;
+    background-color: black;
+}
+
+img{
+    height: 50px;
+}
+
+div.footer{
+    display: flex;
+    justify-content: space-between;
+}

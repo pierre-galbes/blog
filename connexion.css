@@ -1,0 +1,15 @@
+main{
+    display: flex;
+    justify-content: center;
+    margin-top: 2%;
+    background-color: blanchedalmond;
+    margin-left: 42%;
+    margin-right:42%;
+
+}
+
+body{
+    background-image: url(https://cache.magicmaman.com/data/photo/w1000_ci/1bk/repas-de-famille.jpg);
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
