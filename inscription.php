@@ -1,63 +1,113 @@
 <?php
 
-$connect= mysqli_connect("localhost","root","","blog");
-
-if (isset($_POST['env']))
-{
-  $email = $_POST['email'];
-  $password = $_POST['password'];
-  $login = $_POST['login'];
-  $conf = $_POST['conf'];
-
-  if (!empty($login) && !empty($password) && !empty($email) && !empty($conf)) {
-    $sql=mysqli_query ($connect,"SELECT * FROM utilisateurs WHERE login='$login'"); 
-    $res= mysqli_fetch_all($sql);
-    if (count($res) == 0)
-      if ($password == $conf) {
-        echo 'Bienvenue ! vous pouvez des a présent vous conecter.';
-        $req= mysqli_query($connect,"INSERT INTO utilisateurs (login,password,email,id_droits)
-        VALUES('$login','$password','$email',1)");
-      } else {echo 'Les mots de passes ne corespondent pas';}
-      else {echo 'Ce compte existe deja, essaye un autre login !';}
-  } else {echo 'Tout les champs doivent etre remplis';}
-}
+session_start();
 
 ?>
 
 <!DOCTYPE html>
-<html lang="Fr">
+<html lang="fr">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="inscriptionstyle.css">
-  <title>site</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="stylesheet" href="css/inscription.css">
+    <link rel="stylesheet" href="css/header.css">
 </head>
-
 <body>
-  <div class="forum">
-    <h1>Inscription</h1>
-    <div class="forum">
-      <form name="formu" action="" method="post">
-        <br>
-        <input name="login" type="text" placeholder="username" />
-        <br>
-        <br>
-        <input name="email" type="text" placeholder="email" />
-        <br>
-        <br>
-        <input name="password" type="password" placeholder="Ton mdp" />
-        <br>
-        <br>
-        <input name="conf" type="password" placeholder="confimer" />
-        <br>
-        <br>
-        <input name="env" type="submit" placeholder="clic ici">
-        <p class="message">Deja inscrit ? par ici !<a href="connexion.php">Connexion</a></p>
-        <p class="message">Ici un lien vers l'<a href="index.php">accueil</a></p>
-      </form>
-    </div>
+
+<header>
+<?php include("include/header.php") ?></header>
+
+
+   <div class="container">
+           
+                        <div class="formu">
+                        <form name="salut" action="" method="post">
+                        <label class="input1" for="login">Pseudo</label>
+                        <input name="login" type="text" placeholder="username" />
+
+                        <label for="prenom">Prenom</label>
+                        <input class="inpute" name="prenom" type="text" placeholder="prenom" />
+
+                        <label class="label" for="email">Email</label>
+                        <input class="inpute" name="email" type="text" placeholder="exemple@gmail.com" />
+
+                        <label class="label" for="password">Mot de passe</label>
+                        <input class="inpute" name="password" type="password" placeholder="Ton mdp" />
+
+                        <label class="label" for="conf">Confirmation Mot de passe</label>
+                        <input class="inpute" name="conf" type="password" placeholder="confirmation mdp" />
+
+                        <input class="inscription" name="inscription" type="submit" placeholder="Envoyer" />
+                        <p>Deja parmis nous ? <a  href='connexion.php'>connecte toi .</a></p>
+
+                        
+                        <?php
+                  $bdd = mysqli_connect("localhost","root","","blog");
+      
+                  if (isset($_SESSION['login']) == false)
+                  {
+                    
+                      if (isset($_POST['inscription']) && !empty($_POST['login']) && !empty($_POST['password']) && !empty($_POST['conf']) && !empty($_POST['email']) && !empty($_POST['prenom']))
+                      {
+                        
+                          $login = $_POST['login'];
+                         
+                                    $email = $_POST['email'];
+                                    $prenom = $_POST['prenom'];
+                                    $password = $_POST['password'];
+                                    $conf = $_POST['conf'];
+                          $checklogin = "SELECT login FROM utilisateurs WHERE login = '$login'";
+                          $query = mysqli_query($bdd, $checklogin);
+                          $veriflogin = mysqli_fetch_all($query);
+      
+                          if (empty($veriflogin))
+                          {
+                              if ($_POST['password'] == $_POST['conf'])
+                              {
+                                  
+                                  $ajoutbdd = 'INSERT INTO utilisateurs (login, prenom, email, password, id_droits) VALUES ("'.$login.'", "'.$prenom.'", "'.$email.'", "'.$password.'" ,1)';
+                                  $ajout = mysqli_query($bdd, $ajoutbdd);
+                                  echo '<h1 style="text-align: center; color: black">Bienvenue</h1>';
+                                  header ("refresh:2;url=index.php");
+                                  
+                                  
+                              }
+      
+                              else
+                              {
+                                 echo '<h2 style="text-align: center; color: red">La mot de passe et sa confirmation ne sont pas semblable. Réessayez.</h2>';
+                              }
+                          }
+      
+                          
+                          else
+                          {   
+                              echo '<h2 style="text-align: center; color: red">login pas disponible, trouvez-en un autre.</h2>';
+                          }
+                      }
+                      mysqli_close($bdd);
+                  }
+               
+                      
+              ?>
+                  
+                    </form>
+                            
+                </div>
+            </div>
+          
+        </section>
+        
+</header>
+
+
+    <main>
+    
+    </main>
+
 </body>
 
 </html>

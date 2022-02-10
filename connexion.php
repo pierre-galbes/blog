@@ -1,78 +1,81 @@
+<?php
+
+session_start();
+
+$connect= mysqli_connect("localhost","root","","blog");
+
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="connexion.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/header.css">
 </head>
 
 <body>
-
-    <header>
-        <?php
-        include 'header.php';
-    ?>
-    </header>
-
+<header>
+<?php include("include/header.php") ?></header>
     <main>
-        <div class="Aforum">
-            <h1>Connexion</h1>
-            <form method="post" action="">
-                <br>
-                <input name="login" type="text" placeholder="login" required />
-                <br>
-                <br>
-                <input name="password" type="password" placeholder="mdp" requried />
-                <br>
-                <br>
-                <input type=submit value="Envoyer" name="env">
-                <p class="Amessage"> Pas de compte ? par ici !<a href="inscription.php">Inscription</a></p>
-                <p class="Amessage"> Ici un lien vers l'<a href="index.php">accueil</a></p>
-            </form>
-        </div>
-            
-    </main>
+    <div class="container">
+            <div class="formu">
+                <h1 class="h1">Connecte toi !</h1>
 
-    <footer>
-    <?php
-        include 'footer.php';
-    ?>
-    </footer>
-</body>
+                <form name="salut" action="" method="post">
+                    <label class="input1" for="login">Pseudo</label>
+                    <input name="login" type="text" placeholder="username" />
 
-</html>
+                    <label for="password">Mot de passe</label>
+                    <input name="password" type="password" placeholder="Ton mdp" />
 
+
+                    <input class="env" name="env" type="submit" Envoyer />
+                    
 <?php
-
-$connect= mysqli_connect("localhost","root","","blog");
-
-if(isset($_POST['login']) && isset($_POST['password'])){
+    if(isset($_POST['login']) && isset($_POST['password'])){
     $login=$_POST['login'];
     $password=$_POST['password'];
     $sql=mysqli_query ($connect,"SELECT * FROM utilisateurs WHERE login='$login' AND password='$password'");
     $res= mysqli_fetch_all($sql); 
-}
+    
     if (empty($res)) {
+        echo 'Ton mot de passe ou login est faux  ';
     }
-    else {
-        if($res[0][2] == $password){
-        session_start();
-        if ( $password == 'admin' && $login == 'admin'){
-            $_SESSION['admin']=1;
-            echo 'Connecté en tant que ADMIN';
-            header ("refresh:4;url=admin.php");
-        }
-        else {
-            echo $res[0][1] .' est connecté, en attente de redirection...';
-            $_SESSION["id"] = $res[0][0];
-            header ("refresh:4;url=profil.php");
-        }
-        }
+     else {
+        if($res[0][4] == $password){
+            
+        if ( $password == 'Admin'){
+                
+        header ("refresh:2;url=admin.php");
+    
+                                    }
             else {
-            echo "pas bon";
-        }
-    }
+                echo $res[0][2] .'Bonjour, tu va être rediriger vers ton profil';
+                $_SESSION["id"] = $res[0][0];
+                header ("refresh:4;url=profil.php");
+
+                
+            }
+         }else {
+             echo "pas bon";
+         }
+     }
+     
+}
+
+
 ?>
+
+                </form>
+            </div>
+        </div>
+    </main>
+  
+</body>
+
+</html>

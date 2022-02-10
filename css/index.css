@@ -1,0 +1,15 @@
+
+
+span.texte{
+    position: relative;
+    top:170px;
+    right: 62%;
+    font-size:28px;
+    color: rgb(7, 8, 7);
+}
+
+body{
+    background-image: url(https://www.cdiscount.com/pdt2/0/7/7/1/700x700/auc2009852741077/rw/noir-cuisine-stickers-muraux-decoration-de-la-mais.jpg);
+    background-size:contain;
+    
+}
