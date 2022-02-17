@@ -1,48 +1,96 @@
-<?php
-session_start();
-$bdd = new PDO("mysql:host=localhost;dbname=blog;charset=utf8", "root", "");
-$articlesParPage = 5;
-$articlesTotalesReq = $bdd->query('SELECT id FROM articles');
-$articlesTotales = $articlesTotalesReq->rowCount();
-$pagesTotales = ceil($articlesTotales/$articlesParPage);
-if(isset($_GET['start']) AND !empty($_GET['start']) AND $_GET['start'] > 0 AND $_GET['start'] <= $pagesTotales) {
-   $_GET['start'] = intval($_GET['start']);
-   $pageCourante = $_GET['start'];
-} else {
-   $pageCourante = 1;
-}
-$depart = ($pageCourante-1)*$articlesParPage;
+<?php session_start();
+require_once("config/bdd.php");
+$sql = "SELECT * FROM categories";
+$req = $bdd->prepare($sql);
+$req->execute();
+
+
+$troisdernierarticlesql = "SELECT categories.nom, articles.id, articles.article, articles.id_utilisateur, articles.id_categorie, articles.date, articles.titre, utilisateurs.login FROM `articles` INNER JOIN categories ON articles.id_categorie = categories.id INNER JOIN utilisateurs ON utilisateurs.id = articles.id_utilisateur ORDER BY date DESC LIMIT 0,3";
+$requetearticle = $bdd->prepare($troisdernierarticlesql);
+$requetearticle->execute();
+$article = $requetearticle->fetchAll();
+
+
+
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
 <head>
-
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="css/header.css">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <title>Index</title>
 </head>
-<header>
-<?php include("include/header.php") ?></header>
+<!-- background -->
+<div class="az">
+
+    <body>
+        <header>
+            <?php
+            if (isset($_SESSION['login'])) { 
+                include_once("include/headeronline.php"); 
+            } else {
+                include_once('include/header.php'); 
+            }
+            ?>
+        </header>
+
+        <main>
+
+        <h1 class="text-light text-center">Les 3 derniers articles publié</h1>
+            <hr class="text-light">
+            <?php foreach ($article as $a) { ?>
+
+                <div class="centrer">
+                    <h1>
+                        <?= $a['titre'] ?>
+                    </h1>
+                    <h2>
+                        Catégorie : <?= $a['nom'] ?>
+                    </h2>
+                    <br>
+                    <?php
+                    $charMax = 200;
+                    $articlelenght = strlen($a['article']);
+                    if ($articlelenght > $charMax) { ?>
+                        <div class="letexte">
+
+                            <p><?php $string = substr($a['article'], 0, $charMax) . "...";
+                                echo $string;
+                                ?>
+                                <br>
+                                <a class="btn btn-info" href="article.php?article=<?= $a['id'] ?>">
+                                    Lire la suite de l'article
+                                </a>
+                        </div>
+
+                    <?php } else { ?>
+                        <div class="text-center text-light">
+                            <a class="charlie" href="article.php?article=<?= $a['id'] ?>"><?= $a['article'] ?></a>
+                        </div>
+                    <?php } ?>
 
 
-<main>                        
-<br>                       
-</main>                        
-                        
-                        
-                        
-                        
+                    <br>
+                    <p>Publié par : <?= $a['login'] ?></p>
+                </div>
+                <hr class="text-light">
+            <?php  } ?>
 
 
-   </body>
-<footer>
-<?php include("include/footer.php") ?>
-</footer>
-</body>
+        </main>
+        <footer>
+            <?php
+            if (!isset($_SESSION["login"])) { 
+                include_once('include/footer.php');
+            } else if (isset($_SESSION["id_droits"]) == 1337) { 
+                include_once("include/footerAdmin.php");
+            } else if (isset($_SESSION["id_droits"]) == 42) { 
+                include_once("include/footerModo.php");
+            } else { 
+                include_once("include/footerOnline.php");
+            }
+            ?>
+        </footer>
+
+    </body>
+</div>
+
 </html>
-

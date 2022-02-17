@@ -1,0 +1,305 @@
+#fondHead {
+background-image: url(https://images.lpcdn.ca/924x615/201702/23/1355588-faire-cuisine-sans-bon-couteau.jpg);
+background-size:no-repeat ;
+}
+html {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.charlie{
+  text-decoration: none;
+}
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: lightgrey;
+  min-width: 200px;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* HEADER */
+#fondHead{
+  background-image: url(https://images.lpcdn.ca/924x615/201702/23/1355588-faire-cuisine-sans-bon-couteau.jpg);
+  background-size:no-repeat ;
+}   
+  .dropdown {
+      position: relative;
+      display: inline-block;
+  }
+  
+  .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: lightgrey;
+      min-width: 200px;
+      z-index: 1;
+  }
+  
+  .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+  }
+.dropdown:hover .dropdown-content {
+      display: block;
+}
+
+/* MAIN */
+.az{
+  background-image: url(https://p4.wallpaperbetter.com/wallpaper/490/861/235/wood-pretty-picture-background-wallpaper-preview.jpg);
+  background-size:no-repeat ;
+} 
+
+/* INSCRIPTION */
+
+.crinputinscription{
+    margin-left:1em;
+    font-size: 1.5em;
+}
+.crlabelinscription{
+    font-size: 1.5em;
+}
+#crforminscription{
+  display: flex;
+  justify-content: center;
+}
+#ee{
+    margin-left:40em;
+    font-size: 1.5em;
+}
+#crh2inscription{
+  display: flex;
+  justify-content: center;
+}
+#crtableinscription{
+  display: flex;
+  justify-content: center;
+}
+
+#crtdsubmit{
+  display: flex;
+  justify-content: center;
+  width: 136em;
+}
+#crtablesubmit{
+  margin-top: 3em;
+}
+#crsubmitinscription{
+  font-size: 1.5em;
+}
+.crtd{
+  font-size: 1.5em;
+}
+
+/* CONNEXION */
+#crdivconnexion{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* background-color: cornflowerblue; */
+}
+#crh2connexion{
+  display: flex;
+  justify-content: center;
+  /* background-color: chartreuse; */
+}
+#crforconnexion{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* background-color: darkgoldenrod; */
+}
+input{
+  display: flex;
+  justify-content: center;
+}
+.crtdco{
+  display: flex;
+  justify-content: center;
+  font-size: 1.5em;
+}
+#crinputco{
+  font-size: 1em;
+  margin-top: 3em;
+}
+
+/* PROFIL */
+#crdivprofil{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    /* background-color: white; */
+}
+
+/* EDITION PROFIL */
+#crdivedition{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+}
+.crtdedition{
+    margin-left: 1em;
+}
+#crinputedition{
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+    font-size: 1.5em;
+    margin-left: 43em;
+    background-color: blue;
+}
+
+/* CREER ARTICLE */
+#crmaincreer{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* width: 12em;
+    height:12em; */
+    /* background-color: white; */
+}
+#crformcreer{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* background-color: white; */
+    align-items: center;
+    font-size: 1.5em;
+}
+.crtdinscription{
+    margin-top: 1em;
+}
+
+/* FOOTER */
+.crmargin{   
+  margin-bottom: 4%;
+}
+#crfootdiv1{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  background-color:black;
+  height:40em;
+}
+.crfootdiv2{
+  margin-top: 2em;
+  width: 19em;
+  height: 22em;
+  text-decoration: none; 
+}
+.crfootul{
+  list-style:none;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2em;
+}
+.crfooth2{
+  margin-right: 2em;
+  display: flex;
+  justify-content: center;
+  color: white;
+}
+.crfooterhr{
+  color: white;
+}
+.crfootli{
+    margin-top: 1em;
+  margin-right: 2em;
+  display: flex;
+  justify-content: center;
+  font-size: 1.5em;
+}
+.crfoota{
+  text-decoration: none; 
+}
+.crimgfoot1 {
+  width: 2em;
+  height: 2em;
+}
+.crimgfoot2 {
+  width: 2em;
+  height: 2em;
+}
+
+
+.alflex {
+  display: flex;
+  justify-content: right;
+  flex-direction: row;
+}
+
+.red{
+  background-color: rgb(255, 0, 0);
+}
+.letexte {
+  width: 80vw;
+
+
+
+
+}
+
+.letexte p{
+
+height: fit-content;
+overflow-wrap: break-word;
+text-align: center;
+
+}
+
+.legrosarticle {
+  padding-right: 8rem;
+  padding-left: 8rem;
+  text-align: center;
+  padding-top: 3px;
+  height: fit-content;
+  overflow-wrap: break-word;
+  color: white;
+}
+.legrosarticle a {
+  text-decoration: none;
+}
+
+.centrer {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+}
+
+.texte_article{
+  height: fit-content;
+  overflow-wrap: break-word;
+  text-align: center;
+  color:white;
+
+}
+
+.ahref {
+  text-decoration: none;
+}
+
+.blanc{
+  color: white;
+}

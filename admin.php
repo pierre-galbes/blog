@@ -1,230 +1,242 @@
 <?php
-ob_start();
-?>
-<!DOCTYPE html>
-<html>
+session_start();
+require('config/bdd.php');
 
-<head>
-    <title>adminn</title>
-    <link rel="stylesheet" href="css/header.css">
-    <link rel="stylesheet" href="css/admin.css">
-    <meta charset="utf-8">
+$articles = $bdd->query('SELECT articles.`id` as ida, article, id_utilisateur, id_categorie, categories.nom, date, titre FROM articles INNER JOIN categories ON categories.id = articles.id_categorie ORDER BY articles.id ASC;');
+$listearticles = $bdd->query('SELECT `id` as ida, `article`, `id_utilisateur`, `id_categorie`, `date`, `titre` FROM `articles`');
+$lisar = $articles->fetchAll();
+$categories = $bdd->query('SELECT `id` as idc, `nom` FROM `categories`');
+$categoriess = $bdd->query('SELECT `id` as idc, `nom` FROM `categories`');
+$fetchcate = $categories->fetchAll();
+$utilisateurs = $bdd->query('SELECT utilisateurs.`id` as idu, `login`, `password`, `email`, `id_droits`,`nom` FROM `utilisateurs` INNER JOIN droits ON droits.id = utilisateurs.id_droits ORDER BY utilisateurs.id ASC;');
+$listedroits = $bdd->query('SELECT * FROM droits');
+$lis = $listedroits->fetchAll();
 
-</head>
 
-<body>
-    <header>
-        <?php include("include/header.php") ?></header>
-    <?php
-    $bdd = mysqli_connect("localhost", "root", "", "blog");
-    $req = mysqli_query($bdd, " SELECT utilisateurs.id, utilisateurs.login, utilisateurs.prenom, utilisateurs.password, utilisateurs.email, droits.nom FROM utilisateurs INNER JOIN droits ON utilisateurs.id_droits = droits.id");
-    
-    if (isset($_POST['ban'])) {
-        $id1 = $_POST['id'];
-    $reqban = mysqli_query($bdd, "DELETE FROM utilisateurs WHERE id = $id1");
+// ID nécessaire pour la connexion 
+if (!isset($_SESSION['id']) || $_SESSION['id_droits'] != 1337) {
+    header("Location: profil.php");
+    exit();
+}
+
+// Fonction supprimé une catégorie
+if (isset($_GET['supprimercateg']) && !empty($_GET['supprimercateg'])) {
+    $supprimercateg = (int) $_GET['supprimercateg'];
+    $reqc = $bdd->prepare('DELETE FROM categories WHERE id = ?');
+    $reqc->execute(array($supprimercateg));
+    header("Location: admin.php");
+    exit();
+}
+
+
+// Fonction ajouter une catégorie 
+if (isset($_POST['creercateg']) && !empty($_POST['creercateg'])) {
+    $creercateg = htmlspecialchars($_POST['creercateg']);
+    $requetecategor = $bdd->prepare("SELECT * FROM categories WHERE nom = ?"); // SAVOIR SI LE MEME LOGIN EST PRIS
+    $requetecategor->execute(array($creercateg));
+    $categexist = $requetecategor->rowCount(); // rowCount = Si une ligne existe = PAS BON
+
+    if ($categexist !== 0) {
+        $_SESSION['msg'] = $_SESSION['msg'] . "la catégorie existe déjà <br>";
+    } else {
+
+        $creercategorie = htmlspecialchars($_POST['creercateg']);
+        $insertcateg = $bdd->prepare("INSERT INTO categories (nom) VALUES (?)");
+        $insertcateg->execute(array($creercategorie));
+        header('Location: admin.php');
+        exit();
     }
-    $res = mysqli_fetch_all($req);
-    $id = $res[0][0];
-    $login = $res[0][1];
-    $email = $res[0][3];
-    $prenom = $res[0][2];
+}
 
-    if (isset($_POST['env'])) {
-        $id1 = $_POST['id'];
-        $login1 = $_POST['login'];
-        $prenom1 = $_POST['prenom'];
-        $email1 = $_POST['email'];
-        if ($_POST['statut'] == "utilisateur") {
-            $id_droit = 1;
-        } elseif ($_POST['statut'] == "administrateur") {
-            $id_droit = 1337;
-        } elseif ($_POST['statut'] == "moderateur") {
-            $id_droit = 42;
-        }
-        
-        $req2 = mysqli_query($bdd, "UPDATE utilisateurs SET login='$login1', prenom='$prenom1', email='$email1', id_droits='$id_droit' WHERE  id = $id1 ");
-        header("Location: admin.php");
+
+// Fonction supprimé un utilisateur
+if (isset($_GET['supprimer']) && !empty($_GET['supprimer'])) {
+    $supprimer = (int) $_GET['supprimer'];
+    $req = $bdd->prepare('DELETE FROM utilisateurs WHERE id = ?');
+    $req->execute(array($supprimer));
+    header("Location: admin.php");
+    exit();
+}
+
+// Fonction modifié la catégorie
+if (isset($_POST['newcateg']) && !empty($_POST['newcateg'])) {
+    $idchange = $_POST['idc'];
+    $newcateg = $_POST['newcateg'];
+    $requetecateg = $bdd->prepare("SELECT * FROM categories WHERE nom = ?"); // SAVOIR SI LE MEME LOGIN EST PRIS
+    $requetecateg->execute(array($newcateg));
+    $categexist = $requetecateg->rowCount(); // rowCount = Si une ligne existe = PAS BON
+
+    if ($categexist !== 0) {
+        $_SESSION['msg'] = $_SESSION['msg'] . "la catégorie existe déjà <br>";
+    } else {
+
+        $newcategorie = htmlspecialchars($_POST['newcateg']);
+        $insertcateg = $bdd->prepare("UPDATE categories SET nom = ? WHERE id = ?");
+        $insertcateg->execute(array($newcategorie, $idchange));
+        header('Location: admin.php');
+        exit();
     }
-
-    ?>
-    <form action="#" method="post">
-    </br></br></br>
-    <h1 id=infoprofil >Informations du profil</h1>
-
-    <table>
-        <thead>
-            <th>id</th>
-            <th>login</th>
-            <th>prenom</th>
-            <th>email</th>
-            <th>rôle</th>
-        </thead>
-        <tbody>
+}
 
 
-    </form>
+// Fonction Modifié le login d'un utilisateur
+if (isset($_POST['newlogin']) && !empty($_POST['newlogin'])) {
+    $idchange = $_POST['id'];
+    $login = $_POST['newlogin'];
+    $requetelogin = $bdd->prepare("SELECT * FROM utilisateurs WHERE login = ?"); // SAVOIR SI LE MEME LOGIN EST PRIS
+    $requetelogin->execute(array($login));
+    $loginexist = $requetelogin->rowCount(); // rowCount = Si une ligne existe = PAS BON
 
-    
-            <?php
-
-            foreach ($res as $utilisateur) {
-                echo '<tr><form method="post" action="">
-                    <td> <input type="text"  value="' . $utilisateur[0] . '" name="id"></td>
-                    <td> <input type="text" value="' . $utilisateur[1] . '" name="login"></td>
-                    <td> <input type="text" value="' . $utilisateur[2] . '" name="prenom"></td>
-                    <td> <input type="text" value="' . $utilisateur[3] . '" name="email"></td>
-                    <td> <select name="statut" >
-                    <option name="uti" value="utilisateur">utilisateur</option>
-                    <option name="modo" value="moderateur">moderateur</option>
-                    <option name="administrateur" value="administrateur">administrateur</option>
-               </select></td><
-               <td>   <input type="submit" name="env"  Envoyer /> </td>
-               <td>   <input type="submit"  name=ban value="Bannir"/> </td>
-                    </form> </tr>';
-            }
-
-
-            ?>
-        </tbody>
-    </table>
-
-
-    <?php
-
-
-    $bdd = mysqli_connect("localhost", "root", "", "blog");
-
-
-    //    j'ai récup les infos d'article avec ma req
-    $req = mysqli_query($bdd, "SELECT articles.id, articles.titre,articles.article,articles.id_categorie,articles.date,utilisateurs.login FROM articles INNER JOIN utilisateurs ON utilisateurs.id = articles.id_utilisateur");
-
-    $res = mysqli_fetch_all($req, MYSQLI_ASSOC);
-    $id = $res[0]['id'];
-    $login = $res[0]['login'];
-    $titre = $res[0]['titre'];
-    $article = $res[0]['article'];
-
-    if (isset($_POST['ban'])) {
-        $id1 = $_POST['id'];
-
-        $reqban = mysqli_query($bdd, "DELETE FROM articles WHERE id = $id");
+    if ($loginexist !== 0) {
+        $_SESSION['msg'] = $_SESSION['msg'] . "le login existe déjà  <br>";
+    } else {
+        $newlogin = htmlspecialchars($_POST['newlogin']);
+        $insertlogin = $bdd->prepare("UPDATE utilisateurs SET login = ? WHERE id = ?");
+        $insertlogin->execute(array($newlogin, $idchange));
+        header('Location: admin.php');
+        exit();
     }
-
-
-    // Un if pour que quand les infos sont def, qu'elle puisse update les infos dans la bdd
-    if (isset($_POST['envarticle'])) {
-        $titre1 = $_POST['titre'];
-        $article1 = $_POST['article'];
-        $id = $_POST['id'];
-
-
-        $req = ("UPDATE articles SET titre= '$titre1' , article= '$article1' WHERE  id = $id");
-        var_dump($req);
-        $req2 = mysqli_query($bdd, $req);
-    }
-
-    ?>
-    <form action="#" method="post">
-
-
-
-
-    </form>
-
-    <h1>Tableau</h1>
-    <table>
-        <thead>
-            <th>ID </th>
-            <th>Titre</th>
-            <th>Article</th>
-            <th>login</th>
-
-        </thead>
-        <tbody>
-            <?php
-            //   Foreach pour afficher les articles
-            foreach ($res as $articles) {
-                echo '<tr><form method="post" action="">
-           <td> <input type="titre"  value="' . $articles['id'] . '" name="id"></td>
-           <td> <input type="titre"  value="' . $articles['titre'] . '" name="titre"></td>
-           <td> <input type="article"  value="' . $articles['article'] . '" name="article"></td>
-           <td> <input type="text" value="' . $articles['login'] . '" name="login"> </td>
-           <td>   <input type="submit" name="envarticle"  Envoyer /> </td>
-           <td>   <input type="submit"  name=ban value="Bannir"/> </td>
-           </form> </tr>';
-            }
-
-
-            ?>
-        </tbody>
-    </table>
-</body>
-
-<?php
-
-$req3 = mysqli_query($bdd, "SELECT * FROM categories");
-$res3 = mysqli_fetch_all($req3, MYSQLI_ASSOC);
-
-
-?>
-
-<h1>Categorie</h1>
-<table>
-    <thead>
-        <th>nom</th>
-    </thead>
-    <tbody>
-        <?php
-
-        foreach ($res3 as $categorie) {
-            echo '<tr><form method="post" action="">
-            <td> <input type="titre"  value="' . $categorie['id'] . '" name="id"></td>
-            <td> <input type="titre"  value="' . $categorie['nom'] . '" name="nom"></td>
-            <td>   <input type="submit" name="envcategorie"  Envoyer /> </td>
-            <td>   <input type="submit"  name="ban" value="Bannir"/> </td>
-            </form> </tr>';
-
-            
-        
-
-        if (isset($_POST['ban'])) {
-            
-            $idcate = $_POST['id'];
-            
-
-            $reqban = mysqli_query($bdd, "DELETE FROM categories WHERE id = $idcate");
-            var_dump($reqban);
-        }
 }
 
 
 
 
-        //  creer categorie
-        echo '<tr><form method="post" action="">
-       <td> <input type="titre"  placeholder="Crrer une categorie" value="" name="creercategorie"></td>
-       <td> <input type="submit" name="categorie"  Envoyer /> </td>
-       </form> </tr>';
+
+// modif email 
+if (isset($_POST['newmail']) && !empty($_POST['newmail'])) {
+    $idchange = $_POST['id'];
+    $email = $_POST['newmail'];
+    $requetemail = $bdd->prepare("SELECT * FROM utilisateurs WHERE email = ?"); 
+    $requetemail->execute(array($email));
+    $emailexist = $requetemail->rowCount(); 
+
+    if ($emailexist !== 0) {
+        $_SESSION['msg'] = $_SESSION['msg'] . "l'email existe déjà <br>";
+    } else {
+
+        $newmail = htmlspecialchars($_POST['newmail']);
+        $insertlogin = $bdd->prepare("UPDATE utilisateurs SET email = ? WHERE id = ?");
+        $insertlogin->execute(array($newmail, $idchange));
+        header('Location: admin.php');
+        exit();
+    }
+}
+// Fonction modifié le rang utilisateur
+if (isset($_POST['select'])) {
+
+    $idchange = $_POST['id'];
+    $rang = $_POST['select'];
+    $changerrang = $bdd->prepare("UPDATE utilisateurs SET id_droits = ? WHERE id = ?");
+    $changerrang->execute(array($rang, $idchange));
+    header('Location: admin.php');
+    exit();
+}
 
 
 
-
-        if (isset($_POST['categorie'])) {
-            $nomcategorie = $_POST['creercategorie'];
-            $reqcreercate = mysqli_query($bdd, "INSERT INTO categories (nom) VALUES ('$nomcategorie')");
-            header("Location: admin.php");
-            var_dump($reqcreercate);
-        }
-
-
-        ?>
-    </tbody>
-</table>
-
-
-</body>
-
-</html>
-<?php
-ob_end_flush();
 ?>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <title>Espace Admin</title>
+    
+</head>
+
+<body>
+    <header>
+        <?php if (isset($_SESSION['login'])) {
+            include_once("include/headeronline.php");
+        } else {
+            include_once('include/header.php');
+        }
+        ?>
+    </header>
+    <div class="az">
+        <main class="container pt-3">
+            <h2 class="text-light">Espace Admin</h2>
+            <br />
+            <table>
+                <thead>
+                    <tr class=test>
+                        <th class="text-light">Login</th>
+                        <th class="text-light">Email</th>
+                        <th class="text-light">Droits</th>
+                    </tr>
+                </thead>
+                <?php while ($u = $utilisateurs->fetch()) { ?>
+
+                    <form class="" method="POST">
+                        ""
+                        <input id="id" type="hidden" name="id" value="<?php echo $u['idu']; ?>">
+                        <label class="text-light" for="newlogin"></label>
+                        <td><input class="" id="newlogin" type="text" name="newlogin" value="<?php echo $u['login']; ?>"></td>
+                        <label class="text-light" for="newmail"></label>
+                        <td><input class="" id="newmail" type="mail" name="newmail" value="<?php echo $u['email']; ?>"></td>
+                        <td>
+                            <select name="select" id="select">
+                                <?php foreach ($lis as $key => $value) { ?>
+                                    <option <?= $u['id_droits'] == $value['id'] ? "selected" : NULL ?> value="<?= $value['id'] ?>"><?= $value['nom'] ?></option>
+                                <?php
+                                } ?>
+                            </select>
+                        </td>
+                        <td class=test><a class="btn btn-danger" href="admin.php?supprimer=<?= $u['idu'] ?>">Bannir</a></td>
+                        <td class=test><input id="" type="submit" class="btn btn-primary" name="submit" value="Modifier !"></td>
+                    </form>
+                    </tr>
+                <?php } ?>
+            </table>
+
+            <table>
+                <thead>
+                    <tr class=test>
+                        <th class="text-light">Catégories</th>
+
+                    </tr>
+                </thead>
+                <?php while ($c = $categoriess->fetch()) { ?>
+                    <form method="POST">
+                        <input id="idc" type="hidden" name="idc" value="<?php echo $c['idc']; ?>">
+                        <label class="text-light" for="newcateg"></label>
+                        <td><input class="" id="newcateg" type="text" name="newcateg" value="<?php echo $c['nom']; ?>"></td>
+                        <td class=test><a class="btn btn-danger" href="admin.php?supprimercateg=<?= $c['idc'] ?>">Supprimer la catégorie</a></td>
+                        <td class=test><input id="" type="submit" class="btn btn-primary" name="submit" value="Modifier"></td>
+                    </form>
+                    </tr>
+                <?php } ?>
+                <form method="POST">
+                    <label class="mt-4 text-light" for="creercateg"></label>
+                    <td><input class="mt-4" id="creercateg" type="text" name="creercateg" placeholder="Ajoutez une catégorie..."></td>
+                    <td class=test><input id="" type="submit" class="btn btn-primary mt-4 ms-3" name="submit" value="Confirmé !"></td>
+                </form>
+            </table>
+            <br>
+            <a href="editionarticle.php"><input class="btn btn-secondary btn-lg" type="button" value="Modifier article"></a>
+            <?php
+
+            if (isset($_SESSION['msg'])) {
+                echo '<font color="red">' . $_SESSION['msg'] . '</font><br /><br />';
+                $_SESSION['msg'] = "";
+            }
+            ?>
+        </main>
+    </div>
+    <footer>
+        <?php
+        if (!isset($_SESSION["login"])) { // si l'utilisateur n'est pas connecté
+            include_once('include/footer.php');
+        } else if (isset($_SESSION["id_droits"]) == 1337) { 
+            include_once("include/footerAdmin.php");
+        } else if (isset($_SESSION["id_droits"]) == 42) { 
+            include_once("include/footerModo.php");
+        } else { 
+            include_once("include/footerOnline.php");
+        }
+        ?>
+    </footer>
+</body>
+</head>

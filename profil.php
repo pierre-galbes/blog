@@ -1,27 +1,12 @@
 <?php
-
 session_start();
-$id = $_SESSION["id"];
-$bdd= mysqli_connect("localhost","root","","blog");
-$req= mysqli_query($bdd,"SELECT * FROM utilisateurs WHERE id = $id");
-$res= mysqli_fetch_all($req,MYSQLI_ASSOC);
-$login = $res[0]['login'];
-$prenom = $res[0]['prenom'];
-$email = $res[0]['email'];
-$password = $res[0]['password']; 
-
-
-if (isset($_POST['env']))
-{
-   
-    $email1 = $_POST['email'];
-    $prenom1 = $_POST['prenom'];
-    $password1 = $_POST['password'];
-    $login1 = $_POST['login'];
-    $req2= mysqli_query($bdd,"UPDATE utilisateurs SET login='$login1', prenom='$prenom1', email='$email1', password='$password1' WHERE  id = $id ");
-    header("Location: profil.php");
-} 
-
+require('config/bdd.php');
+if (isset($_SESSION['id']) && $_SESSION['id'] > 0) {
+    $getid = intval($_SESSION['id']); 
+    $requtilisateur = $bdd->prepare('SELECT * FROM utilisateurs WHERE id = ?'); 
+    $requtilisateur->execute(array($getid)); // return le tableau de mon utilisateur
+    $infoutilisateur = $requtilisateur->fetch(); // récupere les informations que j'appelle
+}
 ?>
 
 <!DOCTYPE html>
@@ -31,37 +16,58 @@ if (isset($_POST['env']))
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>profil</title>
-    <link rel="stylesheet" href="css/header.css">
-    <link rel="stylesheet" href="css/profil.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <title>Profil</title>
 </head>
+
 <body>
-<header>
-<main>
-<?php include("include/header.php") ?></header>
+    <header>
+        <?php if (isset($_SESSION['login'])) {
+            include_once("include/headeronline.php");
+        } else {
+            header('location: connexion.php');
+            exit;
+        }
+        ?>
+    </header>
+    <div class="az">
+        <main>
+            <div id="crdivprofil">
+                <h2 class="text-light">Profil de <?php echo $infoutilisateur['login'] ?> </h2>
+                <br />
+                <p class="text-light"> Login = <?php echo $infoutilisateur['login'] ?></p>
+                <br />
+                <p class="text-light"> Email = <?php echo $infoutilisateur['email'] ?></p>
+                <br />
+                <a class="profila" href="editionprofil.php"> Editer son profil</a>
+                <br />
+                <?php
+                // ID nécessaire pour voir creer un article
+                if ($_SESSION['id_droits'] == 1337) { ?>
+                    <a href="créerarticle.php">Créer un article</a><br>
 
-        <section class="home">
-            <div class="container">
-                <div class="formu">
-                    <form name="salut" action="" method="post">
-                        <label class="input1" for="login">Pseudo</label>
-                        <input name="login" value="<?php echo $login?>" type="text" placeholder="username" />
+                <?php  }                 ?>
 
-                        <label for="prenom">Prenom</label>
-                        <input class="inpute"  value="<?php echo $prenom?>" name="prenom" type="text" placeholder="prenom" />
 
-                        <label class="label" for="email">Email</label>
-                        <input class="inpute"  value="<?php echo $email?>" name="email" type="email" placeholder="exemple@hotmail.fr" />
 
-                        <label class="label" for="password">Mot de passe</label>
-                        <input class="inpute" value="<?php echo $password?>" name="password" type="password" placeholder="Ton mdp" />
+            </div>
+    </div>
+    </main>
 
-                        <input class="env" name="env" type="submit" Envoyer />
-                      
-                    </form>
-                </div>
-        </section>
-</header>
-</main>
-<body>
-</html>
+    <footer>
+        <?php
+        if (!isset($_SESSION["login"])) { 
+            include_once('include/footer.php');
+        } else if (isset($_SESSION["id_droits"]) == 1337) { 
+            include_once("include/footerAdmin.php");
+        } else if (isset($_SESSION["id_droits"]) == 42) { 
+            include_once("include/footerModo.php");
+        } else { 
+            include_once("include/footerOnline.php");
+        }
+
+        ?>
+    </footer>
+</body>
+
+</html> 
